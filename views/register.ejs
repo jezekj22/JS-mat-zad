@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrace</title>
+</head>
+<body>
+  <h1>Registrace</h1>
+
+  <% if (error) { %>
+    <p style="color:red;"><%= error %></p>
+  <% } %>
+
+  <form action="/auth/register" method="POST">
+    <label>Uživatelské jméno:</label><br>
+    <input type="text" name="username" required><br>
+
+    <label>Heslo:</label><br>
+    <input type="password" name="password" required><br>
+
+    <label>
+      <input type="checkbox" name="ai_agreement" required>
+      Souhlasím, že mnou vložená data mohou být využita pro trénink AI
+    </label><br><br>
+
+    <button type="submit">Registrovat</button>
+  </form>
+
+  <p><a href="/auth/login">Už máš účet? Přihlaš se.</a></p>
+</body>
+</html>

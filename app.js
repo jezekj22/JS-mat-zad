@@ -24,6 +24,7 @@ app.get('/', (req, res) => {
   res.render('index');
 });
 app.use('/notes', notesRoutes);
+app.use('/auth', authRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server běží na http://localhost:${PORT}`));
