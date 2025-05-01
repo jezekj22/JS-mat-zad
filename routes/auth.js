@@ -1,38 +1,43 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const Database = require('better-sqlite3');
-const db = new Database('data.db');
-
+const supabase = require('../supabase'); // přidej si správnou cestu
 
 // GET /auth/register
 router.get('/register', (req, res) => {
-    res.render('register', { error: null });
+  res.render('register', { error: null });
 });
 
 // POST /auth/register
-router.post('/register', (req, res) => {
-    const { username, password, ai_agreement } = req.body;
-  
-    if (!ai_agreement) {
-      return res.render('register', { error: 'Musíš souhlasit s využitím dat pro AI.' });
-    }
-  
-    const userExists = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
-    if (userExists) {
-      return res.render('register', { error: 'Toto uživatelské jméno už existuje.' });
-    }
-  
-    const hashedPassword = bcrypt.hashSync(password, 10);
-    db.prepare('INSERT INTO users (username, password_hash, ai_agreement) VALUES (?, ?, ?)').run(
-      username,
-      hashedPassword,
-      1
-    );
-  
-    res.redirect('/auth/login');
-});
+router.post('/register', async (req, res) => {
+  const { username, password, ai_agreement } = req.body;
 
+  if (!ai_agreement) {
+    return res.render('register', { error: 'Musíš souhlasit s využitím dat pro AI.' });
+  }
+
+  const { data: existingUser, error: findError } = await supabase
+    .from('users')
+    .select('*')
+    .eq('username', username)
+    .single();
+
+  if (existingUser) {
+    return res.render('register', { error: 'Toto uživatelské jméno už existuje.' });
+  }
+
+  const hashedPassword = bcrypt.hashSync(password, 10);
+
+  const { error: insertError } = await supabase
+    .from('users')
+    .insert([{ username, password_hash: hashedPassword, ai_agreement: true }]);
+
+  if (insertError) {
+    return res.render('register', { error: 'Chyba při vytváření účtu.' });
+  }
+
+  res.redirect('/auth/login');
+});
 
 // GET /auth/login
 router.get('/login', (req, res) => {
@@ -40,10 +45,14 @@ router.get('/login', (req, res) => {
 });
 
 // POST /auth/login
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
-  const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
+  const { data: user, error: findError } = await supabase
+    .from('users')
+    .select('*')
+    .eq('username', username)
+    .single();
 
   if (!user) {
     return res.render('login', { error: 'Uživatel neexistuje.' });
@@ -54,17 +63,12 @@ router.post('/login', (req, res) => {
     return res.render('login', { error: 'Špatné heslo.' });
   }
 
-  // přihlášení
   req.session.user = {
     id: user.id,
     username: user.username
   };
 
-  res.redirect('/'); // nebo kamkoliv, kam chceš po přihlášení
+  res.redirect('/');
 });
-
-  
-
-
 
 module.exports = router;

@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/jezekj22/JS-mat-zad#readme",
   "dependencies": {
+    "@supabase/supabase-js": "^2.49.4",
     "bcrypt": "^5.1.1",
     "better-sqlite3": "^11.9.1",
     "dotenv": "^16.5.0",
