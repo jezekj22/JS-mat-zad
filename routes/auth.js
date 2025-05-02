@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
-const supabase = require('../supabase'); // přidej si správnou cestu
+const supabase = require('../supabase');
 
 // GET /auth/register
 router.get('/register', (req, res) => {
@@ -68,7 +68,7 @@ router.post('/login', async (req, res) => {
     username: user.username
   };
 
-  res.redirect('/');
+  res.redirect('/dashboard');
 });
 
 module.exports = router;

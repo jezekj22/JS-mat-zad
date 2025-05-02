@@ -20,11 +20,14 @@ app.use(session({
 // ROUTES
 const authRoutes = require('./routes/auth');
 const notesRoutes = require('./routes/notes');
+const dashboardRouter = require('./routes/dashboard');
 app.get('/', (req, res) => {
   res.render('index');
 });
-app.use('/notes', notesRoutes);
 app.use('/auth', authRoutes);
+app.use('/notes', notesRoutes);
+app.use('/dashboard', dashboardRouter);
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server běží na http://localhost:${PORT}`));
