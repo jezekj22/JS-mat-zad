@@ -71,4 +71,42 @@ router.post('/login', async (req, res) => {
   res.redirect('/dashboard');
 });
 
+router.get('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/auth/login');
+  });
+});
+
+router.post('/delete-account', async (req, res) => {
+  const userId = req.session.user.id;
+
+  // Smažeme poznámky
+  const { error: deleteNotesError } = await supabase
+    .from('notes')
+    .delete()
+    .eq('user_id', userId);
+
+  if (deleteNotesError) {
+    console.error(deleteNotesError);
+    return res.redirect('/dashboard');
+  }
+
+  // Smažeme samotného uživatele
+  const { error: deleteUserError } = await supabase
+    .from('users')
+    .delete()
+    .eq('id', userId);
+
+  if (deleteUserError) {
+    console.error(deleteUserError);
+    return res.redirect('/dashboard');
+  }
+
+  // Odhlášení (zrušení session)
+  req.session.destroy(() => {
+    res.redirect('/auth/register');
+  });
+});
+
+
 module.exports = router;

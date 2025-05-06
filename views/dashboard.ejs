@@ -10,6 +10,8 @@
   <div class="container mt-4">
     <h2>Vítej, <%= user.username %>!</h2>
     <a href="/notes/new" class="btn btn-success my-3">+ Nová poznámka</a>
+    <a href="/auth/logout" class="btn btn-outline-danger float-end">Odhlásit se</a>
+
 
     <form method="GET" action="/dashboard">
       <input type="hidden" name="importantOnly" value="<%= !importantOnly %>">
@@ -49,6 +51,9 @@
         <% }); %>
       </div>
     <% } %>
+    <form method="POST" action="/auth/delete-account" onsubmit="return confirm('Opravdu chceš zrušit svůj účet? Všechny poznámky budou smazány!');">
+      <button type="submit" class="btn btn-outline-danger mt-3 my-3">Zrušit účet</button>
+    </form>    
   </div>
 </body>
 </html>
