@@ -57,5 +57,36 @@ router.post('/delete/:id', checkAuth, async (req, res) => {
   res.redirect('/dashboard');
 });
 
+// Přepnutí stavu 'important' pro danou poznámku
+router.post('/toggle-important/:id', checkAuth, async (req, res) => {
+  const noteId = req.params.id;
+  const userId = req.session.user.id;
+
+  // Nejprve zjistíme současnou hodnotu
+  const { data: note, error: fetchError } = await supabase
+    .from('notes')
+    .select('important')
+    .eq('id', noteId)
+    .eq('user_id', userId)
+    .single();
+
+  if (fetchError || !note) {
+    console.error(fetchError || 'Poznámka nenalezena');
+    return res.redirect('/dashboard');
+  }
+
+  // Přepneme boolean
+  const { error: updateError } = await supabase
+    .from('notes')
+    .update({ important: !note.important })
+    .eq('id', noteId)
+    .eq('user_id', userId);
+
+  if (updateError) {
+    console.error(updateError);
+  }
+
+  res.redirect('/dashboard');
+});
 
 module.exports = router;
